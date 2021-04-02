@@ -1,4 +1,5 @@
 using BlazorServerHangfire.Areas.Identity;
+using BlazorServerHangfire.Brokers.CronJobs;
 using BlazorServerHangfire.Brokers.Storages;
 using BlazorServerHangfire.Data;
 using Hangfire;
@@ -50,6 +51,7 @@ namespace BlazorServerHangfire
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             services.AddScoped<IStorageBroker, StorageBroker>();
+            services.AddScoped<ICronJob, CronJob>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
