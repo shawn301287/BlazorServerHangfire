@@ -22,20 +22,25 @@ namespace BlazorServerHangfire.Brokers.CronJobs
             return BackgroundJob.Enqueue(() => storageBroker.InsertValue());
         }
         
-        public string CreateDelayedJob()
+        public string CreateDelayedJob(int delayedSeconds)
         {
-            throw new NotImplementedException();
+            return BackgroundJob.Schedule(() => storageBroker.InsertValue(), TimeSpan.FromSeconds(delayedSeconds));
         }
 
 
-        public string CreateScheduledJob()
+        public string CreateScheduledJob(DateTime recurringAfter)
         {
-            throw new NotImplementedException();
+            return BackgroundJob.Schedule(() => storageBroker.InsertValue(), recurringAfter);
         }
 
-        public string CreateSequentialJob()
+        public void CreateRecurringJob(string cronExpression)
         {
-            throw new NotImplementedException();
+            RecurringJob.AddOrUpdate(() => storageBroker.InsertValue(), cronExpression);
+        }
+
+        public string CreateSequentialJob(string parentJobId)
+        {
+            return BackgroundJob.ContinueJobWith(parentJobId, () => storageBroker.InsertValue());
         }
     }
 }

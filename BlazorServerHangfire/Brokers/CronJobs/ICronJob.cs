@@ -9,10 +9,12 @@ namespace BlazorServerHangfire.Brokers.CronJobs
     {
         string CreateOneTimeJob();
 
-        string CreateDelayedJob();
+        string CreateDelayedJob(int delaySeconds);
 
-        string CreateScheduledJob();
+        string CreateScheduledJob(DateTime recurringTime);
 
-        string CreateSequentialJob();
+        void CreateRecurringJob(string cronExpression);
+
+        string CreateSequentialJob(string parentJobId);
     }
 }
