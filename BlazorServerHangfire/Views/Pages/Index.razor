@@ -1,7 +1,126 @@
 ﻿@page "/"
+@using BlazorServerHangfire.Models
+@using BlazorServerHangfire.Brokers.CronJobs
+@using BlazorServerHangfire.Brokers.Storages
+@inject IStorageBroker storageBroker
+@inject ICronJob cronJob
 
-<h1>Hello, world!</h1>
+<h1>Hangfire</h1>
+<p>
+    An easy way to perform background processing in .NET and .NET Core applications. No Windows Service or separate process required.
+    Backed by persistent storage. Open and free for commercial use.
+</p>
+<a href="https://www.hangfire.io/">Hangfire home page</a>
+<hr />
 
-Welcome to your new app.
+<div class="row">
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    <div class="card col-md-3">
+        <h2>Fire & Forget Jobs</h2>
+        <button @onclick="CreateFireForgetJob">Create Fire and Forget Job</button>
+        <label>@FireForgetResult</label>
+    </div>
+
+    <hr />
+
+    <div class="card col-md-3">
+        <h2>Delayed Jobs</h2>
+        <input type="text" @bind-value="DelaySeconds" />
+        <button @onclick="CreateDelayedJob">Create Delayed Job</button>
+        <label>@DelayedResult</label>
+    </div>
+
+    <hr />
+
+    <div class="card col-md-3">
+        <h2>Recurring Jobs</h2>
+        <input type="datetime" @bind-value="recurringTime" />
+        <button @onclick="CreateReccurringJob">Create Fire and Forget Job</button>
+        <label>@RecurringResult</label>
+    </div>
+
+    <hr />
+
+    <div class="card col-md-3">
+        <h2>Continuous Jobs</h2>
+        <input type="text" @bind-value="parentJobId" />
+        <button @onclick="CreateSequentialJob">Create Sequential Job</button>
+        <label>@SequentialResult</label>
+    </div>
+    <hr />
+
+</div>
+
+<table class="table table-bordered">
+    <thead>
+        <tr><td colspan="2"><button @onclick="GetLogs">Refresh Logs</button></td></tr>
+        <tr>
+            <th>ID</th>
+            <th>TimeStamp</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Logs)
+        {
+            <tr>
+                <th>@item.Id</th>
+                <th>@item.TimeStamp</th>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+
+@code{
+    private List<Logs> Logs { get; set; }
+    private string result { get; set; }
+
+    protected override void OnInitialized()
+    {
+        GetLogs();
+    }
+
+    private void GetLogs()
+    {
+        Logs = storageBroker.SelectAllLogs()
+        .OrderBy(i => i.TimeStamp).ToList();
+    }
+
+    public string FireForgetResult { get; set; }
+    public void CreateFireForgetJob()
+    {
+        var returnedValue = cronJob.CreateOneTimeJob();
+        FireForgetResult = "Job " + returnedValue + " created successfully";
+        GetLogs();
+    }
+
+    public string DelayedResult { get; set; }
+    public int DelaySeconds { get; set; }
+    public void CreateDelayedJob()
+    {
+        var returnedValue = cronJob.CreateDelayedJob(DelaySeconds);
+        DelayedResult = "Job " + returnedValue + " created successfully";
+        GetLogs();
+    }
+
+    public string RecurringResult { get; set; }
+    public DateTime recurringTime { get; set; } = DateTime.Now;
+    private void CreateReccurringJob()
+    {
+        cronJob.CreateScheduledJob(recurringTime);
+        RecurringResult = "Job Scheduled successfully";
+        GetLogs();
+    }
+
+
+    public string SequentialResult { get; set; }
+    public string parentJobId { get; set; }
+    private void CreateSequentialJob()
+    {
+        cronJob.CreateSequentialJob(parentJobId);
+        SequentialResult = "Job successfully attached to Job: " + parentJobId;
+        GetLogs();
+    }
+}
