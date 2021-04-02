@@ -65,6 +65,8 @@ namespace BlazorServerHangfire
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            app.UseHangfireDashboard();
+
             app.UseRouting();
 
             app.UseAuthentication();
