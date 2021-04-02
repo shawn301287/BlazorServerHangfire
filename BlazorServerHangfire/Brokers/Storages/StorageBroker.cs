@@ -1,4 +1,5 @@
 ﻿using BlazorServerHangfire.Data;
+using BlazorServerHangfire.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,8 @@ namespace BlazorServerHangfire.Brokers.Storages
             this.DbContext = applicationDbContext;
         }
 
+
+
         public void InsertValue()
         {
             DbContext.Logs.Add(new Models.Logs()
@@ -24,6 +27,11 @@ namespace BlazorServerHangfire.Brokers.Storages
             });
 
             DbContext.SaveChanges();
+        }
+
+        public IQueryable<Logs> SelectAllLogs()
+        {
+            return DbContext.Logs;
         }
     }
 }
