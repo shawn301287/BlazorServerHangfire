@@ -1,4 +1,5 @@
 using BlazorServerHangfire.Areas.Identity;
+using BlazorServerHangfire.Brokers.Storages;
 using BlazorServerHangfire.Data;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
@@ -47,6 +48,8 @@ namespace BlazorServerHangfire
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddDatabaseDeveloperPageExceptionFilter();
+
+            services.AddScoped<IStorageBroker, StorageBroker>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
